@@ -37,8 +37,8 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col">
       {/* Top Utility Bar */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-[1600px] px-6 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-12 lg:px-32">
+        <div className="mx-auto max-w-6xl py-4 flex items-center justify-between">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-3 group w-fit">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-400 to-violet-600 shadow-lg shadow-violet-500/20 transition-transform group-hover:scale-110">
@@ -74,7 +74,7 @@ export default async function AdminLayout({
               href="/"
               className="group flex cursor-pointer items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-5 py-2 text-[10px] font-black uppercase tracking-widest text-violet-400 transition-all hover:border-violet-400/50 hover:bg-violet-500/20 active:scale-[0.98] shadow-lg shadow-violet-500/5"
             >
-              Return to Dashboard
+              Exit
               <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -91,12 +91,12 @@ export default async function AdminLayout({
       </div>
 
       {/* Main content */}
-      <main className="flex-1 relative selection:bg-violet-500/30">
+      <main className="flex-1 relative selection:bg-violet-500/30 px-12 lg:px-32">
         {/* Ambient background glow */}
         <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-violet-500/[0.03] blur-[140px] rounded-full pointer-events-none" />
         <div className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-fuchsia-500/[0.03] blur-[120px] rounded-full pointer-events-none" />
         
-        <div className="relative mx-auto max-w-[1600px] px-8 pb-32 lg:px-12 z-10">
+        <div className="relative mx-auto max-w-6xl pb-32 z-10">
           {children}
         </div>
       </main>

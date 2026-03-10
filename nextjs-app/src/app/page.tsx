@@ -283,7 +283,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Community Sentiment ─────────────────────────────────────────── */}
-      <section className="relative bg-zinc-950 px-6 py-32 border-b border-white/5 overflow-hidden">
+      <section className="relative bg-zinc-950 px-6 py-12 border-b border-white/5 overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute bottom-0 right-0 w-[800px] h-[400px] bg-fuchsia-500/5 blur-[100px] rounded-full pointer-events-none" />
         
@@ -293,7 +293,7 @@ export default async function HomePage() {
               COMMUNITY SENTIMENT
             </h2>
           </div>
-          <h2 className="text-xl font-medium text-zinc-500 mb-20 uppercase tracking-[0.2em]">
+          <h2 className="text-xl font-medium text-zinc-500 mb-8 uppercase tracking-[0.2em]">
             Meme Likes vs. Dislikes
           </h2>
           <div className="flex justify-center">
