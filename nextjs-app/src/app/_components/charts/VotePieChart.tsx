@@ -54,7 +54,7 @@ export function VotePieChart({ likes, dislikes }: Props) {
   return (
     <div className="flex flex-col items-center w-full min-w-0">
       {/* Explicitly sized container to prevent "width/height -1" errors in Chrome */}
-      <div className="w-full min-w-0 relative h-[450px] sm:h-[650px] -mb-12 flex justify-center">
+      <div className="w-full min-w-0 relative h-[300px] sm:h-[400px] -mb-6 flex justify-center">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
@@ -65,8 +65,8 @@ export function VotePieChart({ likes, dislikes }: Props) {
                   data,
                   cx: "50%",
                   cy: "50%",
-                  innerRadius: 130,
-                  outerRadius: 190,
+                  innerRadius: 80,
+                  outerRadius: 120,
                   paddingAngle: 8,
                   dataKey: "value",
                   animationBegin: 0,
@@ -102,13 +102,13 @@ export function VotePieChart({ likes, dislikes }: Props) {
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full w-full animate-pulse rounded-full border-[20px] border-zinc-900 bg-zinc-900/20" />
+          <div className="h-full w-full animate-pulse rounded-full border-[12px] border-zinc-900 bg-zinc-900/20" />
         )}
         
         {/* Center Percentage Label */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-7xl font-black tracking-tighter text-white sm:text-9xl">{likePct}%</span>
-          <span className="text-sm font-bold uppercase tracking-[0.5em] text-purple-400 mt-2">Positive Vibes</span>
+          <span className="text-5xl font-black tracking-tighter text-white sm:text-6xl">{likePct}%</span>
+          <span className="text-xs font-bold uppercase tracking-[0.4em] text-purple-400 mt-1">Positive Vibes</span>
         </div>
       </div>
 
