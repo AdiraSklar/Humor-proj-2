@@ -41,7 +41,6 @@ export default async function HomePage() {
   const [
     { data: images, count: imageCount },
     { data: captions, count: captionCount },
-    { count: userCount },
     { count: flavorCount },
     { count: totalLikesCount },
     { count: totalDislikesCount },
@@ -49,7 +48,6 @@ export default async function HomePage() {
   ] = await Promise.all([
     supabase.from("images").select("id, url, is_public", { count: "exact" }).returns<ImageRow[]>(),
     supabase.from("captions").select("id, image_id, content, like_count, is_public, humor_flavor_id", { count: "exact" }).returns<CaptionRow[]>(),
-    supabase.from("profiles").select("*", { count: "exact", head: true }),
     supabase.from("humor_flavors").select("*", { count: "exact", head: true }),
     supabase.from("caption_votes").select("*", { count: "exact", head: true }).eq("vote_value", 1),
     supabase.from("caption_votes").select("*", { count: "exact", head: true }).eq("vote_value", -1),
@@ -114,7 +112,6 @@ export default async function HomePage() {
   const stats = [
     { label: "Images", value: n(imageCount) },
     { label: "Captions", value: n(captionCount) },
-    { label: "Users", value: n(userCount) },
     { label: "Humor Flavors", value: n(flavorCount) },
     { label: "Likes Given", value: n(totalLikes) },
   ];
