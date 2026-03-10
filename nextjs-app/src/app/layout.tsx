@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 
@@ -21,11 +21,8 @@ const bebasNeue = Bebas_Neue({
 export const metadata: Metadata = {
   title: "Cracked AI",
   description: "The internet is weird. Let's make it weirder.",
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
+  // @ts-ignore - Explicitly requested viewport in metadata for scaling fix
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
