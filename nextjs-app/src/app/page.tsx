@@ -317,7 +317,7 @@ export default async function HomePage() {
       </section>
 
       <footer className="border-t border-zinc-800 bg-zinc-950 px-6 py-8 text-center text-xs text-zinc-500">
-        Stats are live — data reflects what's visible to the public.
+
       </footer>
     </div>
   );
