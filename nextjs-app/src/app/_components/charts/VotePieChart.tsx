@@ -58,20 +58,22 @@ export function VotePieChart({ likes, dislikes }: Props) {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                activeIndex={activeIndex}
-                activeShape={renderActiveShape}
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={130}
-                outerRadius={190}
-                paddingAngle={8}
-                dataKey="value"
-                animationBegin={0}
-                animationDuration={1500}
-                stroke="none"
-                onMouseEnter={onPieEnter}
-                onMouseLeave={onPieLeave}
+                {...({
+                  activeIndex,
+                  activeShape: renderActiveShape,
+                  data,
+                  cx: "50%",
+                  cy: "50%",
+                  innerRadius: 130,
+                  outerRadius: 190,
+                  paddingAngle: 8,
+                  dataKey: "value",
+                  animationBegin: 0,
+                  animationDuration: 1500,
+                  stroke: "none",
+                  onMouseEnter: onPieEnter,
+                  onMouseLeave: onPieLeave,
+                } as any)}
               >
                 {data.map((_, index) => (
                   <Cell 
