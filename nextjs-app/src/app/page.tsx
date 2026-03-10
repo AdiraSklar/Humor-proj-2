@@ -88,14 +88,8 @@ export default async function HomePage() {
 
   const totalLikes = caps.reduce((sum, c) => sum + Math.max(0, c.like_count ?? 0), 0);
 
-  // top 7 images by caption count
+  // Map images for quick lookup
   const imageUrlMap = new Map(imgs.map((img) => [img.id, img.url]));
-  const topImages = [...captionsByImage.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([id, count]) => ({ id, url: imageUrlMap.get(id) ?? null, count }))
-    .filter((img) => img.url)
-    .slice(0, 7)
-    .map((img, i) => ({ ...img, rank: i + 1 }));
 
   // top 5 most-liked captions
   const topLiked = [...caps]
@@ -149,8 +143,11 @@ export default async function HomePage() {
       </nav>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="bg-zinc-950 pt-24 pb-16">
-        <div className="px-6">
+      <section className="relative bg-zinc-950 pt-24 pb-12 overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="relative px-6 z-10">
           <div className="mx-auto max-w-5xl flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-purple-400">
               <span className="relative flex h-2 w-2">
@@ -160,11 +157,11 @@ export default async function HomePage() {
               Live Platform Data
             </div>
             
-            <h1 className="mt-8 text-6xl font-black tracking-tighter text-white sm:text-8xl">
+            <h1 className="mt-8 text-4xl font-black tracking-tighter text-white sm:text-5xl">
               Stats & <span className="bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">Claps</span>
             </h1>
             
-            <p className="mt-6 max-w-2xl text-lg text-zinc-400 sm:text-xl leading-relaxed">
+            <p className="mt-4 max-w-xl text-base text-zinc-500 leading-relaxed">
               The internet is weird. Let&apos;s make it weirder. <br className="hidden sm:block" />
               A real-time snapshot of our community&apos;s collective creativity.
             </p>
@@ -172,17 +169,17 @@ export default async function HomePage() {
         </div>
 
         {/* ── Marquee Stats ───────────────────────────────────────────────── */}
-        <div className="mt-20 relative flex overflow-x-hidden border-y border-white/5 bg-zinc-900/40 py-10 backdrop-blur-md shadow-[0_0_40px_rgba(168,85,247,0.03)]">
+        <div className="mt-16 relative flex overflow-x-hidden border-y border-white/5 bg-zinc-900/40 py-6 backdrop-blur-md shadow-[0_0_40px_rgba(168,85,247,0.03)]">
           <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-zinc-950 to-transparent z-10 pointer-events-none"></div>
           <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-zinc-950 to-transparent z-10 pointer-events-none"></div>
           
           <div className="animate-marquee whitespace-nowrap flex items-center">
             {[...stats, ...stats, ...stats, ...stats].map((stat, i) => (
-              <div key={i} className="flex items-center mx-12">
-                <span className="text-4xl font-bold tracking-tighter text-white sm:text-6xl">
+              <div key={i} className="flex items-center mx-10">
+                <span className="text-2xl font-bold tracking-tighter text-white sm:text-3xl">
                   <span className="text-purple-400">{stat.value}</span> <span className="text-zinc-500 font-medium tracking-tight ml-2">{stat.label}</span>
                 </span>
-                <span className="mx-12 text-zinc-800 text-4xl">•</span>
+                <span className="mx-10 text-zinc-800 text-2xl">•</span>
               </div>
             ))}
           </div>
@@ -320,7 +317,7 @@ export default async function HomePage() {
       </section>
 
       <footer className="border-t border-zinc-800 bg-zinc-950 px-6 py-8 text-center text-xs text-zinc-500">
-
+        Stats are live — data reflects what's visible to the public.
       </footer>
     </div>
   );
