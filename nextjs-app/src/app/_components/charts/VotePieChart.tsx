@@ -52,11 +52,12 @@ export function VotePieChart({ likes, dislikes }: Props) {
   const likePct = total > 0 ? Math.round((likes / total) * 100) : 0;
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative h-[450px] w-[450px] sm:h-[650px] sm:w-[650px] -mb-12">
+    <div className="flex flex-col items-center w-full min-w-0">
+      {/* Explicitly sized container to prevent "width/height -1" errors in Chrome */}
+      <div className="w-full min-w-0 relative h-[450px] sm:h-[650px] -mb-12 flex justify-center">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <Pie
                 {...({
                   activeIndex,
