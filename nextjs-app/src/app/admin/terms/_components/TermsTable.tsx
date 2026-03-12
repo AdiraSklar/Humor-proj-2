@@ -57,7 +57,7 @@ export default function TermsTable({
     const raw =
       field === "term_type_id" ? String(term.term_type_id ?? "")
       : field === "priority" ? String(term.priority)
-      : String((term as Record<string, unknown>)[field] ?? "");
+      : String((term as unknown as Record<string, unknown>)[field] ?? "");
     setEditing({ id: term.id, field, value: raw });
   }
 
