@@ -1,19 +1,13 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
-import { createEmail, deleteEmail } from "./actions";
+import { createEmail } from "./actions";
+import EmailsTable from "./_components/EmailsTable";
 
 interface WhitelistEmail {
   id: number;
   email_address: string;
   created_datetime_utc: string;
   modified_datetime_utc: string | null;
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()];
-  return `${mon} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
 
 export default async function WhitelistEmailAddressesPage() {
@@ -78,32 +72,7 @@ export default async function WhitelistEmailAddressesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {!emails?.length ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-16 text-center text-zinc-500 italic">
-                    No whitelisted email addresses.
-                  </td>
-                </tr>
-              ) : (
-                emails.map((e) => (
-                  <tr key={e.id} className="group transition-colors hover:bg-white/[0.02]">
-                    <td className="px-6 py-4 font-mono text-xs text-zinc-600">{e.id}</td>
-                    <td className="px-6 py-4 font-bold text-zinc-200">{e.email_address}</td>
-                    <td className="px-6 py-4 text-xs text-zinc-500 tabular-nums">{formatDate(e.created_datetime_utc)}</td>
-                    <td className="px-6 py-4 text-xs text-zinc-500 tabular-nums">{formatDate(e.modified_datetime_utc)}</td>
-                    <td className="px-6 py-4 text-right">
-                      <form action={deleteEmail.bind(null, e.id)}>
-                        <button
-                          type="submit"
-                          className="cursor-pointer rounded-xl border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-500 transition-all hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 active:scale-[0.98]"
-                        >
-                          Delete
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))
-              )}
+              <EmailsTable emails={emails ?? []} />
             </tbody>
           </table>
         </div>

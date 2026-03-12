@@ -1,6 +1,7 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
-import { createDomain, deleteDomain } from "./actions";
+import { createDomain } from "./actions";
+import DomainsTable from "./_components/DomainsTable";
 
 interface AllowedDomain {
   id: number;
@@ -75,31 +76,7 @@ export default async function AllowedSignupDomainsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {!domains?.length ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-16 text-center text-zinc-500 italic">
-                    No allowed domains configured.
-                  </td>
-                </tr>
-              ) : (
-                domains.map((d) => (
-                  <tr key={d.id} className="group transition-colors hover:bg-white/[0.02]">
-                    <td className="px-6 py-4 font-mono text-xs text-zinc-600">{d.id}</td>
-                    <td className="px-6 py-4 font-bold text-zinc-200">{d.apex_domain}</td>
-                    <td className="px-6 py-4 text-xs text-zinc-500 tabular-nums">{formatDate(d.created_datetime_utc)}</td>
-                    <td className="px-6 py-4 text-right">
-                      <form action={deleteDomain.bind(null, d.id)}>
-                        <button
-                          type="submit"
-                          className="cursor-pointer rounded-xl border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-500 transition-all hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 active:scale-[0.98]"
-                        >
-                          Delete
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))
-              )}
+              <DomainsTable domains={domains ?? []} />
             </tbody>
           </table>
         </div>

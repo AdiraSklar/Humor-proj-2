@@ -1,6 +1,7 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
 import { FilterBar } from "./_components/FilterBar";
+import ExpandableText from "../_components/ExpandableText";
 
 interface Caption {
   id: string;
@@ -139,9 +140,11 @@ export default async function CaptionsPage({ searchParams }: Props) {
                     </td>
 
                     {/* Content */}
-                    <td className="px-6 py-4">
-                      <p className="text-zinc-200 font-medium leading-relaxed max-w-md group-hover:text-white transition-colors">
-                        {caption.content || <span className="text-zinc-600 italic">Empty caption</span>}
+                    <td className="px-6 py-4 max-w-md">
+                      <p className="text-zinc-200 font-medium leading-relaxed group-hover:text-white transition-colors">
+                        {caption.content
+                          ? <ExpandableText text={caption.content} max={120} />
+                          : <span className="text-zinc-600 italic">Empty caption</span>}
                       </p>
                       <div className="flex gap-3 mt-1.5">
                         <span className="text-[9px] font-mono uppercase tracking-tighter text-zinc-500 group-hover:text-purple-400">ID: {caption.id.slice(0, 8)}</span>

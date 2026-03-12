@@ -21,6 +21,21 @@ export async function createEmail(formData: FormData) {
   revalidatePath(PATH);
 }
 
+export async function updateEmail(formData: FormData) {
+  const result = await requireSuperadmin();
+  if (!result.authorized) throw new Error("Forbidden");
+
+  const id = Number(formData.get("id"));
+  const email_address = (formData.get("email_address") as string)?.trim().toLowerCase();
+  if (!id || !email_address) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("whitelist_email_addresses").update({ email_address, modified_datetime_utc: new Date().toISOString() }).eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(PATH);
+}
+
 export async function deleteEmail(id: number) {
   const result = await requireSuperadmin();
   if (!result.authorized) throw new Error("Forbidden");

@@ -1,6 +1,7 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import TermsTable from "./_components/TermsTable";
 
 interface Term {
   id: number;
@@ -8,18 +9,18 @@ interface Term {
   definition: string;
   example: string;
   priority: number;
+  term_type_id: number | null;
   created_datetime_utc: string;
   term_types: { name: string } | null;
 }
 
+interface TermType {
+  id: number;
+  name: string;
+}
+
 type Props = { searchParams: Promise<{ page?: string; q?: string }> };
 const PAGE_SIZE = 50;
-
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()];
-  return `${mon} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
-}
 
 export default async function TermsPage({ searchParams }: Props) {
   const result = await requireSuperadmin();
@@ -33,14 +34,17 @@ export default async function TermsPage({ searchParams }: Props) {
   const supabase = await createClient();
   let query = supabase
     .from("terms")
-    .select("id, term, definition, example, priority, created_datetime_utc, term_types(name)", { count: "exact" })
+    .select("id, term, definition, example, priority, term_type_id, created_datetime_utc, term_types(name)", { count: "exact" })
     .order("priority", { ascending: false })
     .order("term", { ascending: true })
     .range(from, to);
 
   if (q.trim()) query = query.ilike("term", `%${q.trim()}%`);
 
-  const { data: terms, error, count } = await query.returns<Term[]>();
+  const [{ data: terms, error, count }, { data: termTypes }] = await Promise.all([
+    query.returns<Term[]>(),
+    supabase.from("term_types").select("id, name").order("name").returns<TermType[]>(),
+  ]);
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
 
   return (
@@ -95,39 +99,7 @@ export default async function TermsPage({ searchParams }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {!terms?.length ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center text-zinc-500 italic">
-                    {q ? `No terms matching "${q}".` : "No terms yet."}
-                  </td>
-                </tr>
-              ) : (
-                terms.map((t) => (
-                  <tr key={t.id} className="group transition-colors hover:bg-white/[0.02]">
-                    <td className="px-6 py-4 font-bold text-zinc-200">{t.term}</td>
-                    <td className="px-6 py-4">
-                      {t.term_types?.name ? (
-                        <span className="inline-flex items-center rounded-full bg-zinc-800/50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400 border border-white/5">
-                          {t.term_types.name}
-                        </span>
-                      ) : <span className="text-zinc-700 italic text-xs">—</span>}
-                    </td>
-                    <td className="px-6 py-4 text-zinc-400 text-xs max-w-xs">
-                      {t.definition.length > 100 ? t.definition.slice(0, 100) + "…" : t.definition}
-                    </td>
-                    <td className="px-6 py-4 text-center font-black text-zinc-300 tabular-nums">{t.priority}</td>
-                    <td className="px-6 py-4 text-right text-xs text-zinc-500 tabular-nums">{formatDate(t.created_datetime_utc)}</td>
-                    <td className="px-6 py-4 text-right">
-                      <Link
-                        href={`/admin/terms/${t.id}`}
-                        className="cursor-pointer rounded-xl border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-violet-500/10 hover:text-violet-400 hover:border-violet-500/20 active:scale-[0.98]"
-                      >
-                        Edit
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
+              <TermsTable terms={terms ?? []} termTypes={termTypes ?? []} q={q} />
             </tbody>
           </table>
         </div>

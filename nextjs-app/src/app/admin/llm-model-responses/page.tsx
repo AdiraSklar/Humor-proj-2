@@ -1,6 +1,7 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import ExpandableText from "../_components/ExpandableText";
 
 interface LlmModelResponse {
   id: string;
@@ -25,10 +26,6 @@ function formatDate(iso: string) {
   return `${mon} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
 
-function truncate(str: string | null, max = 80) {
-  if (!str) return <span className="text-zinc-600 italic">—</span>;
-  return str.length > max ? str.slice(0, max) + "…" : str;
-}
 
 export default async function LlmModelResponsesPage({ searchParams }: Props) {
   const result = await requireSuperadmin();
@@ -107,7 +104,11 @@ export default async function LlmModelResponsesPage({ searchParams }: Props) {
                         </span>
                       ) : <span className="text-zinc-600 italic">—</span>}
                     </td>
-                    <td className="px-6 py-4 text-zinc-400 text-xs max-w-[200px]">{truncate(r.llm_model_response)}</td>
+                    <td className="px-6 py-4 text-zinc-400 text-xs max-w-[200px]">
+                      {r.llm_model_response
+                        ? <ExpandableText text={r.llm_model_response} max={80} />
+                        : <span className="text-zinc-600 italic">—</span>}
+                    </td>
                     <td className="px-6 py-4 text-center font-black text-zinc-200 tabular-nums">{r.processing_time_seconds}</td>
                     <td className="px-6 py-4 text-center font-mono text-xs text-zinc-500">
                       {r.llm_temperature ?? <span className="text-zinc-700">—</span>}

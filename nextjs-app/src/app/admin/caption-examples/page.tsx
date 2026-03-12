@@ -1,6 +1,7 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import ExpandableText from "../_components/ExpandableText";
 
 interface CaptionExample {
   id: number;
@@ -18,9 +19,6 @@ function formatDate(iso: string) {
   return `${mon} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
 
-function truncate(str: string, max = 80) {
-  return str.length > max ? str.slice(0, max) + "…" : str;
-}
 
 export default async function CaptionExamplesPage() {
   const result = await requireSuperadmin();
@@ -83,9 +81,9 @@ export default async function CaptionExamplesPage() {
                 examples.map((ex) => (
                   <tr key={ex.id} className="group transition-colors hover:bg-white/[0.02]">
                     <td className="px-6 py-4 text-center font-black text-zinc-300 tabular-nums">{ex.priority}</td>
-                    <td className="px-6 py-4 text-zinc-400 text-xs max-w-[160px]">{truncate(ex.image_description, 80)}</td>
-                    <td className="px-6 py-4 text-zinc-200 text-xs max-w-[160px] font-medium">{truncate(ex.caption, 80)}</td>
-                    <td className="px-6 py-4 text-zinc-500 text-xs max-w-[160px]">{truncate(ex.explanation, 80)}</td>
+                    <td className="px-6 py-4 text-zinc-400 text-xs max-w-[160px]"><ExpandableText text={ex.image_description} max={80} /></td>
+                    <td className="px-6 py-4 text-zinc-200 text-xs max-w-[160px] font-medium"><ExpandableText text={ex.caption} max={80} /></td>
+                    <td className="px-6 py-4 text-zinc-500 text-xs max-w-[160px]"><ExpandableText text={ex.explanation} max={80} /></td>
                     <td className="px-6 py-4">
                       {ex.image_id ? (
                         <Link

@@ -1,6 +1,7 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
 import { UsersPageHeader } from "./_components/UsersPageHeader";
+import ExpandableText from "../_components/ExpandableText";
 
 interface Profile {
   id: string;
@@ -102,7 +103,7 @@ export default async function UsersPage({ searchParams }: Props) {
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-mono text-[10px] uppercase tracking-tighter text-zinc-500 group-hover:text-purple-400 transition-colors">
-                        {user.id.slice(0, 12)}...
+                        <ExpandableText text={user.id} max={12} />
                       </span>
                     </td>
                     <td className="px-6 py-4 text-zinc-400 group-hover:text-zinc-200 transition-colors">

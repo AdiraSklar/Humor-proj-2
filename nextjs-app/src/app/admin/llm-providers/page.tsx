@@ -1,17 +1,12 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
-import { createProvider, deleteProvider } from "./actions";
+import { createProvider } from "./actions";
+import ProvidersTable from "./_components/ProvidersTable";
 
 interface LlmProvider {
   id: number;
   name: string;
   created_datetime_utc: string;
-}
-
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()];
-  return `${mon} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
 
 export default async function LlmProvidersPage() {
@@ -75,31 +70,7 @@ export default async function LlmProvidersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {!providers?.length ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-16 text-center text-zinc-500 italic">
-                    No providers yet.
-                  </td>
-                </tr>
-              ) : (
-                providers.map((p) => (
-                  <tr key={p.id} className="group transition-colors hover:bg-white/[0.02]">
-                    <td className="px-6 py-4 font-mono text-xs text-zinc-600">{p.id}</td>
-                    <td className="px-6 py-4 font-bold text-zinc-200">{p.name}</td>
-                    <td className="px-6 py-4 text-xs text-zinc-500 tabular-nums">{formatDate(p.created_datetime_utc)}</td>
-                    <td className="px-6 py-4 text-right">
-                      <form action={deleteProvider.bind(null, p.id)}>
-                        <button
-                          type="submit"
-                          className="cursor-pointer rounded-xl border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-500 transition-all hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 active:scale-[0.98]"
-                        >
-                          Delete
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))
-              )}
+              <ProvidersTable providers={providers ?? []} />
             </tbody>
           </table>
         </div>
