@@ -37,7 +37,6 @@ const sections: NavSection[] = [
     label: "Humor Engine",
     items: [
       { href: "/admin/humor-flavors", label: "Humor Flavors" },
-      { href: "/admin/humor-flavor-steps", label: "Flavor Steps" },
       { href: "/admin/humor-flavor-mix", label: "Flavor Mix" },
     ],
   },

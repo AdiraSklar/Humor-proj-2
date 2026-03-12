@@ -1,5 +1,6 @@
 import { requireSuperadmin } from "@/lib/auth/requireSuperadmin";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 
 interface HumorFlavor {
   id: number;
@@ -50,12 +51,13 @@ export default async function HumorFlavorsPage() {
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-500">Slug</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-500">Description</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-500 text-right">Created</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-500 text-right">Humor Flavor Steps</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {!flavors?.length ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-16 text-center text-zinc-500 italic">
+                  <td colSpan={5} className="px-6 py-16 text-center text-zinc-500 italic">
                     No humor flavors found.
                   </td>
                 </tr>
@@ -70,6 +72,14 @@ export default async function HumorFlavorsPage() {
                     </td>
                     <td className="px-6 py-4 text-zinc-400 max-w-md">{f.description ?? <span className="text-zinc-600 italic">—</span>}</td>
                     <td className="px-6 py-4 text-right text-xs text-zinc-500 tabular-nums">{formatDate(f.created_datetime_utc)}</td>
+                    <td className="px-6 py-4 text-right">
+                      <Link
+                        href={`/admin/humor-flavors/${f.id}`}
+                        className="cursor-pointer whitespace-nowrap rounded-xl border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-violet-500/10 hover:text-violet-400 hover:border-violet-500/20 active:scale-[0.98]"
+                      >
+                        View →
+                      </Link>
+                    </td>
                   </tr>
                 ))
               )}
