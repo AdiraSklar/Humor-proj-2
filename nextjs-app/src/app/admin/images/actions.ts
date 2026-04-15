@@ -28,7 +28,11 @@ export async function createImage(
   if (!payload.url) return { error: "URL is required." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("images").insert(payload);
+  const { error } = await supabase.from("images").insert({
+    ...payload,
+    created_by_user_id: result.profile.id,
+    modified_by_user_id: result.profile.id,
+  });
   if (error) return { error: error.message };
 
   redirect("/admin/images");
@@ -48,7 +52,10 @@ export async function updateImage(
   if (!payload.url) return { error: "URL is required." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("images").update(payload).eq("id", id);
+  const { error } = await supabase
+    .from("images")
+    .update({ ...payload, modified_by_user_id: result.profile.id })
+    .eq("id", id);
   if (error) return { error: error.message };
 
   redirect("/admin/images");

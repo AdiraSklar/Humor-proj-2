@@ -15,7 +15,11 @@ export async function createEmail(formData: FormData) {
   if (!email_address) return;
 
   const supabase = await createClient();
-  const { error } = await supabase.from("whitelist_email_addresses").insert({ email_address });
+  const { error } = await supabase.from("whitelist_email_addresses").insert({
+    email_address,
+    created_by_user_id: result.profile.id,
+    modified_by_user_id: result.profile.id,
+  });
   if (error) throw new Error(error.message);
 
   revalidatePath(PATH);
@@ -30,7 +34,10 @@ export async function updateEmail(formData: FormData) {
   if (!id || !email_address) return;
 
   const supabase = await createClient();
-  const { error } = await supabase.from("whitelist_email_addresses").update({ email_address, modified_datetime_utc: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabase
+    .from("whitelist_email_addresses")
+    .update({ email_address, modified_by_user_id: result.profile.id })
+    .eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath(PATH);

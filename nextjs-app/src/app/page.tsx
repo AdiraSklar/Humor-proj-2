@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NavSignInButton } from "./_components/NavSignInButton";
 import { VotePieChart } from "./_components/charts/VotePieChart";
 import { HumorFlavorChart } from "./_components/charts/HumorFlavorChart";
+import { PodiumCarousel, type PodiumSlide } from "./_components/PodiumCarousel";
 
 // ── types ──────────────────────────────────────────────────────────────────
 
@@ -18,6 +19,23 @@ interface CaptionRow {
   like_count: number | null;
   is_public: boolean;
   humor_flavor_id: string | null;
+}
+
+interface ControversyRow {
+  id: string;
+  content: string;
+  image_url: string;
+  total_votes: number;
+  likes: number;
+  dislikes: number;
+  controversy_score: number;
+}
+
+interface TrendingRow {
+  id: string;
+  content: string;
+  image_url: string;
+  vote_count: number;
 }
 
 // ── helpers ────────────────────────────────────────────────────────────────
@@ -45,6 +63,8 @@ export default async function HomePage() {
     { count: totalLikesCount },
     { count: totalDislikesCount },
     { data: flavors },
+    { data: controversyRaw },
+    { data: trendingRaw },
   ] = await Promise.all([
     supabase.from("images").select("id, url, is_public", { count: "exact" }).returns<ImageRow[]>(),
     supabase.from("captions").select("id, image_id, content, like_count, is_public, humor_flavor_id", { count: "exact" }).returns<CaptionRow[]>(),
@@ -52,6 +72,8 @@ export default async function HomePage() {
     supabase.from("caption_votes").select("*", { count: "exact", head: true }).eq("vote_value", 1),
     supabase.from("caption_votes").select("*", { count: "exact", head: true }).eq("vote_value", -1),
     supabase.from("humor_flavors").select("id, slug"),
+    supabase.from("v_caption_controversy").select("*").order("controversy_score", { ascending: true }).order("total_votes", { ascending: false }).limit(5).returns<ControversyRow[]>(),
+    supabase.from("v_caption_trending_week").select("*").order("vote_count", { ascending: false }).limit(5).returns<TrendingRow[]>(),
   ]);
 
   const imgs = images ?? [];
@@ -102,6 +124,65 @@ export default async function HomePage() {
       likeCount: c.like_count ?? 0,
       imageUrl: imageUrlMap.get(c.image_id!)!,
     }));
+
+  // ── carousel slides ────────────────────────────────────────────────────────
+
+  const podiumSlides: PodiumSlide[] = [
+    {
+      title: "THE PODIUM",
+      subtitle: "Memes people loved most",
+      emoji: "🏆",
+      positions: [
+        { label: "Most Liked", medal: "🥇" },
+        { label: "Second Place", medal: "🥈" },
+        { label: "Third Place", medal: "🥉" },
+      ],
+      entries: topLiked.slice(0, 3).map((c, i) => ({
+        id: c.id,
+        content: c.content,
+        imageUrl: c.imageUrl,
+        mainStat: c.likeCount,
+        mainStatLabel: "likes",
+      })),
+    },
+    {
+      title: "TRENDING",
+      subtitle: "Most votes cast this week",
+      emoji: "🔥",
+      positions: [
+        { label: "Hottest This Week", medal: "🥇" },
+        { label: "2nd Trending", medal: "🥈" },
+        { label: "3rd Trending", medal: "🥉" },
+      ],
+      entries: (trendingRaw ?? []).slice(0, 3).map((r) => ({
+        id: r.id,
+        content: r.content,
+        imageUrl: r.image_url,
+        mainStat: r.vote_count,
+        mainStatLabel: "votes this week",
+      })),
+    },
+    {
+      title: "MOST CONTROVERSIAL",
+      subtitle: "The people couldn't decide",
+      emoji: "⚡",
+      positions: [
+        { label: "Most Divided", medal: "🥇" },
+        { label: "2nd Most Divided", medal: "🥈" },
+        { label: "3rd Most Divided", medal: "🥉" },
+      ],
+      entries: (controversyRaw ?? []).slice(0, 3).map((r) => ({
+        id: r.id,
+        content: r.content,
+        imageUrl: r.image_url,
+        mainStat: r.total_votes,
+        mainStatLabel: "total votes",
+        extraBadge: `${r.likes}♥ · ${r.dislikes}✗`,
+        likes: r.likes,
+        dislikes: r.dislikes,
+      })),
+    },
+  ];
 
   const stats = [
     { label: "Images", value: n(imageCount) },
@@ -186,95 +267,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── The Podium ───────────────────────────────────────────────────── */}
-      <section className="relative bg-zinc-900/50 px-6 py-32 border-b border-white/5">
-        <div className="mx-auto max-w-5xl text-center">
-          <div className="flex flex-col items-center justify-center gap-6 mb-4">
-            <span className="text-7xl sm:text-9xl">🏆</span>
-            <h2 className="font-display bg-gradient-to-r from-purple-400 via-fuchsia-400 to-purple-500 bg-clip-text text-5xl tracking-[0.35em] text-transparent md:text-7xl">
-              THE PODIUM
-            </h2>
-          </div>
-          <h2 className="text-xl font-medium text-zinc-500 mb-20 uppercase tracking-[0.2em]">
-            Memes people loved most
-          </h2>
-
-          {topLiked.length === 0 ? (
-            <p className="mt-8 text-sm text-zinc-500">No liked captions yet.</p>
-          ) : (
-            <div className="flex flex-col items-end justify-center gap-6 sm:flex-row sm:items-end lg:gap-10">
-              {[topLiked[1], topLiked[0], topLiked[2]].filter(Boolean).map((cap, idx, arr) => {
-                const isFirst = arr.length === 3 ? idx === 1 : arr.length === 2 ? idx === 0 : true;
-                const isSecond = arr.length === 3 ? idx === 0 : arr.length === 2 ? idx === 1 : false;
-                const isThird = arr.length === 3 ? idx === 2 : false;
-
-                let ringColor = "border-zinc-700";
-                let bgColor = "bg-zinc-950";
-                let height = "min-h-[320px]";
-                let label = "Runner Up";
-                let medal = "🥈";
-                let shadow = "shadow-fuchsia-500/5";
-                let glow = "";
-
-                if (isFirst) {
-                  ringColor = "border-fuchsia-500/50 shadow-fuchsia-500/10";
-                  bgColor = "bg-zinc-950 border-fuchsia-500/20";
-                  height = "min-h-[420px]";
-                  label = "Most Liked";
-                  medal = "🥇";
-                  shadow = "shadow-fuchsia-500/10";
-                  glow = "before:absolute before:inset-0 before:-z-10 before:bg-fuchsia-500/30 before:blur-[80px] before:rounded-full before:scale-125 after:absolute after:inset-0 after:-z-20 after:bg-purple-500/20 after:blur-[120px] after:rounded-full after:scale-150";
-                } else if (isSecond) {
-                  ringColor = "border-zinc-500/30 shadow-zinc-400/10";
-                  height = "min-h-[360px]";
-                  label = "Second Place";
-                  medal = "🥈";
-                  glow = "before:absolute before:inset-0 before:-z-10 before:bg-purple-500/20 before:blur-[60px] before:rounded-full before:scale-110 after:absolute after:inset-0 after:-z-20 after:bg-fuchsia-500/10 after:blur-[90px] after:rounded-full after:scale-125";
-                } else if (isThird) {
-                  ringColor = "border-purple-800/40 shadow-purple-900/10";
-                  height = "min-h-[320px]";
-                  label = "Third Place";
-                  medal = "🥉";
-                  glow = "before:absolute before:inset-0 before:-z-10 before:bg-purple-900/20 before:blur-[50px] before:rounded-full before:scale-100 after:absolute after:inset-0 after:-z-20 after:bg-indigo-500/10 after:blur-[80px] after:rounded-full after:scale-110";
-                }
-
-                return (
-                  <div
-                    key={cap.id}
-                    className={`relative flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border ${ringColor} ${bgColor} ${height} ${shadow} transition-all hover:scale-[1.02] sm:w-72 shadow-2xl ${glow}`}
-                  >
-                    <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white backdrop-blur-md border border-white/10">
-                      <span className="text-red-400">♥</span> {n(cap.likeCount)}
-                    </div>
-                    <div className="h-44 w-full overflow-hidden bg-zinc-800">
-                      <img src={cap.imageUrl} alt="" className="h-full w-full object-cover" />
-                    </div>
-                    <div className="flex flex-1 flex-col p-6 text-left">
-                      <div className="mb-4">
-                        <span className="font-serif text-4xl leading-none text-zinc-700">&ldquo;</span>
-                        <p className="line-clamp-4 text-base font-medium leading-relaxed text-zinc-100 mt-[-10px]">
-                          {cap.content || <span className="text-zinc-500 italic">No content</span>}
-                        </p>
-                      </div>
-                      <div className="mt-auto pt-4 border-t border-white/5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
-                              {label}
-                            </p>
-                            <p className="text-xs text-zinc-400 mt-0.5">Caption-image pair</p>
-                          </div>
-                          <span className="text-4xl">{medal}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* ── Podium Carousel ──────────────────────────────────────────────── */}
+      <PodiumCarousel slides={podiumSlides} />
 
       {/* ── Community Sentiment ─────────────────────────────────────────── */}
       <section className="relative bg-zinc-950 px-6 py-12 border-b border-white/5 overflow-hidden">

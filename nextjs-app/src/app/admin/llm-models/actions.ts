@@ -23,6 +23,8 @@ export async function createModel(formData: FormData) {
     llm_provider_id: provider_id,
     provider_model_id,
     is_temperature_supported,
+    created_by_user_id: result.profile.id,
+    modified_by_user_id: result.profile.id,
   });
   if (error) throw new Error(error.message);
 
@@ -47,6 +49,7 @@ export async function updateModel(formData: FormData) {
     llm_provider_id: provider_id,
     provider_model_id,
     is_temperature_supported,
+    modified_by_user_id: result.profile.id,
   }).eq("id", id);
   if (error) throw new Error(error.message);
 

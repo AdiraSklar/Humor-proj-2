@@ -15,7 +15,11 @@ export async function createProvider(formData: FormData) {
   if (!name) return;
 
   const supabase = await createClient();
-  const { error } = await supabase.from("llm_providers").insert({ name });
+  const { error } = await supabase.from("llm_providers").insert({
+    name,
+    created_by_user_id: result.profile.id,
+    modified_by_user_id: result.profile.id,
+  });
   if (error) throw new Error(error.message);
 
   revalidatePath(PATH);
@@ -30,7 +34,10 @@ export async function updateProvider(formData: FormData) {
   if (!id || !name) return;
 
   const supabase = await createClient();
-  const { error } = await supabase.from("llm_providers").update({ name }).eq("id", id);
+  const { error } = await supabase
+    .from("llm_providers")
+    .update({ name, modified_by_user_id: result.profile.id })
+    .eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath(PATH);

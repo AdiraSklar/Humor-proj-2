@@ -19,7 +19,7 @@ export async function updateFlavorMix(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("humor_flavor_mix")
-    .update({ caption_count, humor_flavor_id })
+    .update({ caption_count, humor_flavor_id, modified_by_user_id: result.profile.id })
     .eq("id", id);
 
   if (error) throw new Error(error.message);

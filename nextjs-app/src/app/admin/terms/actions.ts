@@ -20,7 +20,7 @@ export async function updateTermField(
   const supabase = await createClient();
   const { error } = await supabase
     .from("terms")
-    .update({ [field]: value, modified_datetime_utc: new Date().toISOString() })
+    .update({ [field]: value, modified_by_user_id: result.profile.id })
     .eq("id", id);
   if (error) throw new Error(error.message);
 
@@ -47,7 +47,11 @@ export async function createTerm(formData: FormData) {
   if (!payload.term || !payload.definition || !payload.example) throw new Error("Missing required fields.");
 
   const supabase = await createClient();
-  const { error } = await supabase.from("terms").insert(payload);
+  const { error } = await supabase.from("terms").insert({
+    ...payload,
+    created_by_user_id: result.profile.id,
+    modified_by_user_id: result.profile.id,
+  });
   if (error) throw new Error(error.message);
 
   redirect(LIST_PATH);
@@ -66,7 +70,7 @@ export async function updateTerm(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("terms")
-    .update({ ...payload, modified_datetime_utc: new Date().toISOString() })
+    .update({ ...payload, modified_by_user_id: result.profile.id })
     .eq("id", id);
   if (error) throw new Error(error.message);
 

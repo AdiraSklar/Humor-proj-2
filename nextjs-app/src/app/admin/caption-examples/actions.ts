@@ -27,7 +27,11 @@ export async function createExample(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("caption_examples").insert(payload);
+  const { error } = await supabase.from("caption_examples").insert({
+    ...payload,
+    created_by_user_id: result.profile.id,
+    modified_by_user_id: result.profile.id,
+  });
   if (error) throw new Error(error.message);
 
   redirect(LIST_PATH);
@@ -48,7 +52,7 @@ export async function updateExample(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("caption_examples")
-    .update({ ...payload, modified_datetime_utc: new Date().toISOString() })
+    .update({ ...payload, modified_by_user_id: result.profile.id })
     .eq("id", id);
   if (error) throw new Error(error.message);
 
