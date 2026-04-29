@@ -36,6 +36,7 @@ export default function LoginPage() {
 }
 
 function GoogleIcon() {
+
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
       <path
